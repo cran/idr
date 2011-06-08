@@ -67,9 +67,9 @@ get.correspondence(x1, x2, t, spline.df = NULL)
 	      appearing on only one replicate. 
 }
 \references{
-  %% ~put references to the literature/web site here ~
-   Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)
-Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics. In press.
+  Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)
+   Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics, Vol. 5, No. 3, 1752-1779.
+
 }
 \author{
   %%  ~~who you are~~
@@ -89,9 +89,10 @@ Measuring reproducibility of high-throughput experiments. Annals of Applied Stat
 # salmon data 
 data(salmon)
 
-# get.correspondence() needs large ranks have high correlation and
-# small ranks have low correlation. In this dataset, small values
-# have high correlation and large values have low correlation.
+# get.correspondence() needs the observations with high ranks have 
+# high correlation and the observations with low ranks have low correlation. 
+# In this dataset, small values have high correlation and large values 
+# have low correlation.
 # Ranking negative values makes the data follow the structure required
 # by get.correspondence().
 # There are 28 observations in this data set.
@@ -132,7 +133,8 @@ abline(h=1, lty=3)
 # observations before hitting the ties. Then it can be plotted using the
 # following
 plot(uv$psi$t[1:uv$psi$jump.point], uv$psi$value[1:uv$psi$jump.point], xlab="t",
-ylab="psi", xlim=c(0, max(uv$psi$t[1:uv$psi$jump.point])), ylim=c(0, max(uv$psi$value[1:uv$psi$jump.point])), cex.lab=2)
+ylab="psi", xlim=c(0, max(uv$psi$t[1:uv$psi$jump.point])), 
+ylim=c(0, max(uv$psi$value[1:uv$psi$jump.point])), cex.lab=2)
 lines(uv$psi$smoothed.line, lwd=4)
 abline(coef=c(0,1), lty=3)
  

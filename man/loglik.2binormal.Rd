@@ -30,8 +30,8 @@ Gaussian mixture models (1-p)N(0, 0, 1, 1, 0) + N(mu, mu, sigma,
 sigma, rho)$.
 }
 \references{
-Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)
-Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics. In press.
+  Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)
+   Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics, Vol. 5, No. 3, 1752-1779.
 }
 \author{
 Qunhua Li

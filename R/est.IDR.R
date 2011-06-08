@@ -87,7 +87,7 @@ function(x, mu, sigma, rho, p, eps, max.ite=30){
   idr <- 1-e.z
   o <- order(idr)
   idr.o <- idr[o]
-  idr.rank <- rank(idr.o, ties="max")
+  idr.rank <- rank(idr.o, ties.method="max")
 
   top.mean <- function(index, x){mean(x[1:index])}
 

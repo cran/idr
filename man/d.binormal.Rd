@@ -28,7 +28,8 @@ d.binormal(z.1, z.2, mu, sigma, rho)
 }
 \references{
   Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)
-Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics. In press.
+   Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics, Vol. 5, No. 3, 1752-1779.
+
 }
 \author{
 Qunhua Li

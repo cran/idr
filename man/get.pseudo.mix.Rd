@@ -41,8 +41,8 @@ Mixing proportion of the reproducible component in the mixture model on the late
 %% ...
 }
 \references{
- Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)\\
- Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics. In press.  
+  Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)
+   Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics, Vol. 5, No. 3, 1752-1779.
 %% ~put references to the literature/web site here ~
 }
 \author{

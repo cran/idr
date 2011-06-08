@@ -2,7 +2,7 @@
 \alias{est.IDR}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Irreproducible discovery rate/ copula mixture model
+Estimate the irreproducible discovery rate using the copula mixture model
 }
 \description{
   Fit a Gaussian copula mixture model. 
@@ -40,8 +40,9 @@ est.IDR(x, mu, sigma, rho, p, eps, max.ite=30)
   \item{loglik.trace}{ trajectory of log-likelihood. }
 }
 \references{
- Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)
- Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics. In press.
+  Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)
+   Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics, Vol. 5, No. 3, 1752-1779.
+
 }
 \author{
 Qunhua Li
@@ -57,7 +58,10 @@ Qunhua Li
 %}
 \examples{
 data("simu.idr")
-x <- cbind(simu.idr$x, simu.idr$y)
+
+# simu.idr$x and simu.idr$y are p-values
+# Transfer them such that large values represent significant ones 
+x <- cbind(-simu.idr$x, -simu.idr$y)
 
 mu <- 2.6
 sigma <- 1.3

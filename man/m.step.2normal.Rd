@@ -31,8 +31,8 @@ of the Gaussian mixture model at the latent copula space.
   \item{rho}{ the estimated correlation coefficient of the reproducible component.}
 }
 \references{
-Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)\\
-Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics. In press.
+  Q. Li, J. B. Brown, H. Huang and P. J. Bickel. (2011)
+   Measuring reproducibility of high-throughput experiments. Annals of Applied Statistics, Vol. 5, No. 3, 1752-1779.
 }
 \author{
 Qunhua Li
