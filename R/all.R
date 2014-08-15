@@ -12,7 +12,7 @@
 # License: GPL-2 
 
 est.IDR <-
-function(x, mu, sigma, rho, p, eps, max.ite=30){
+function(x, mu, sigma, rho, p, eps=0.001, max.ite=30){
 
 # This is the main function estimates parameters from the copula mixture models
 # Input:
@@ -34,101 +34,78 @@ function(x, mu, sigma, rho, p, eps, max.ite=30){
 # 2. EM is used to compute the underlining structure, which is a mixture
 #    of two normals
   
-  x1 <- x[,1]
-  x2 <- x[,2]
-  
-  x1.cdf.func <- ecdf(x1)
-  x2.cdf.func <- ecdf(x2)
-  afactor <- length(x1)/(length(x1)+1)
-  x1.cdf <- x1.cdf.func(x1)*afactor
-  x2.cdf <- x2.cdf.func(x2)*afactor
-  
-  # initialization
-  para <- list()
-  para$mu <- mu
-  para$sigma <- sigma
-  para$rho <- rho
-  para$p <- p  
-
-  j <- 1
-  to.run <- TRUE
-  loglik.trace <- c()
-  loglik.inner.trace <- c()
- 
-  z.1 <- get.pseudo.mix(x1.cdf, para$mu, para$sigma, para$rho, para$p)
-  z.2 <- get.pseudo.mix(x2.cdf, para$mu, para$sigma, para$rho, para$p)
-
-  while(to.run){
+    conv <- function(old,new) abs(new-old) < eps*(1+abs(new))
     
-    # get pseudo value in each cycle
+    x1 <- x[, 1]
+    x2 <- x[, 2]
+    x1.cdf.func <- ecdf(x1)
+    x2.cdf.func <- ecdf(x2)
+    afactor <- length(x1)/(length(x1) + 1)
+    x1.cdf <- x1.cdf.func(x1) * afactor
+    x2.cdf <- x2.cdf.func(x2) * afactor
+    para <- list()
+    para$mu <- mu
+    para$sigma <- sigma
+    para$rho <- rho
+    para$p <- p
+    j <- 1
+    to.run <- TRUE
+    loglik.trace <- c()
+    loglik.inner.trace <- c()
+    z.1 <- get.pseudo.mix(x1.cdf, para$mu, para$sigma, para$rho, 
+        para$p)
+    z.2 <- get.pseudo.mix(x2.cdf, para$mu, para$sigma, para$rho, 
+        para$p)
+    while (to.run) {
+        i <- 1
+        while (to.run) {
+            e.z <- e.step.2normal(z.1, z.2, para$mu, para$sigma, 
+                para$rho, para$p)
+            para <- m.step.2normal(z.1, z.2, e.z)
+            if (i > 1) 
+                l.old <- l.new
+            l.new <- loglik.2binormal(z.1, z.2, para$mu, para$sigma, 
+                para$rho, para$p)
+            loglik.inner.trace[i] <- l.new
+            if (i > 1) {
+                to.run <- !conv(loglik.inner.trace[i-1],loglik.inner.trace[i])
+            }
+            i <- i + 1
+        }
+       
+        z.1 <- get.pseudo.mix(x1.cdf, para$mu, para$sigma, para$rho, 
+            para$p)
+        z.2 <- get.pseudo.mix(x2.cdf, para$mu, para$sigma, para$rho, 
+            para$p)
+        if (j > 1) 
+            l.old.outer <- l.new.outer
+        l.new.outer <- loglik.2binormal(z.1, z.2, para$mu, para$sigma, 
+            para$rho, para$p)
 
-    i <- 1
-    while(to.run){
-      
-      # EM for latent structure
-      e.z <- e.step.2normal(z.1, z.2, para$mu, para$sigma, para$rho, para$p)
-      para <- m.step.2normal(z.1, z.2, e.z)
- 
-      if(i > 1)
-        l.old <- l.new
-    
-      # this is just the mixture likelihood of two-component Gaussian
-      l.new <- loglik.2binormal(z.1, z.2, para$mu, para$sigma, para$rho, para$p)
-
-      loglik.inner.trace[i] <- l.new 
-
-      if(i > 1){
-        to.run <- loglik.inner.trace[i]-loglik.inner.trace[i-1]>eps         
-      }
-        
-#      cat("loglik.inner.trace[", i, "]=", loglik.inner.trace[i], "\n")
-#    cat("mu=", para$mu, "sigma=", para$sigma, "p=", para$p, "rho=", para$rho, "\n\n")
-      
-      i <- i+1
+        loglik.trace[j] <- l.new.outer
+        if (j == 1) 
+            to.run <- TRUE
+        else {
+            if (j > max.ite) 
+                to.run <- FALSE
+            else to.run <- !conv(l.old.outer,l.new.outer)
+            
+        }
+        j <- j + 1
     }
-    
-
-    # get pseudo value in each cycle
-    z.1 <- get.pseudo.mix(x1.cdf, para$mu, para$sigma, para$rho, para$p)
-    z.2 <- get.pseudo.mix(x2.cdf, para$mu, para$sigma, para$rho, para$p)
-
-    if(j > 1)
-      l.old.outer <- l.new.outer
-
-    l.new.outer <- loglik.2binormal(z.1, z.2, para$mu, para$sigma, para$rho, para$p)
-
-    loglik.trace[j] <- l.new.outer
-    
-    if(j == 1)
-      to.run <- TRUE
-    else{ # stop when iteration>max.ite
-      if(j > max.ite)
-        to.run <- FALSE
-      else
-        to.run <- l.new.outer - l.old.outer > eps
+    idr <- 1 - e.z
+    o <- order(idr)
+    idr.o <- idr[o]
+    idr.rank <- rank(idr.o, ties.method = "max")
+    top.mean <- function(index, x) {
+        mean(x[1:index])
     }
-
-#    if(j %% 10==0)
-#      cat("loglik.trace[", j, "]=", loglik.trace[j], "\n")
-#    cat("mu=", para$mu, "sigma=", para$sigma, "p=", para$p, "rho=", para$rho, "\n")
-    
-    j <- j+1
-  }
-
-  idr <- 1-e.z
-  o <- order(idr)
-  idr.o <- idr[o]
-  idr.rank <- rank(idr.o, ties.method="max")
-
-  top.mean <- function(index, x){mean(x[1:index])}
-
-  # IDR of selected peaks
-  IDR.o <- sapply(idr.rank, top.mean, idr.o)
-  IDR <- idr # spaceholder
-  IDR[o] <- IDR.o
-    
-  return(list(para=list(p=para$p, rho=para$rho, mu=para$mu, sigma=para$sigma),
-              loglik=l.new, loglik.trace=loglik.trace, idr=1-e.z, IDR=IDR))
+    IDR.o <- sapply(idr.rank, top.mean, idr.o)
+    IDR <- idr
+    IDR[o] <- IDR.o
+    return(list(para = list(p = para$p, rho = para$rho, mu = para$mu, 
+        sigma = para$sigma), loglik = l.new, loglik.trace = loglik.trace, 
+        idr = 1 - e.z, IDR = IDR))
 }
 
 #est.IDR.hist <- function(x, mu, sigma, rho, p, eps, max.ite=30){
@@ -238,6 +215,62 @@ function(x1, x2, t, spline.df=NULL){
 
   return(list(psi=psi, dpsi=dpsi, psi.n=psi.n, dpsi.n=dpsi.n))
 }
+
+
+get.uri.2d <-
+function(x1, x2, tt, vv, spline.df=NULL){
+
+  o <- order(x1, x2, decreasing=TRUE)
+  
+  # sort x2 by the order of x1
+  x2.ordered <- x2[o]
+  
+  tv <- cbind(tt, vv)
+  ntotal <- length(x1) # number of peaks    
+
+  uri <- apply(tv, 1, comp.uri, x=x2.ordered)
+
+  # compute the derivative of URI vs t using small bins
+  uri.binned <- uri[seq(1, length(uri), by=4)]
+  tt.binned <- tt[seq(1, length(uri), by=4)]
+  uri.slope <- (uri.binned[2:(length(uri.binned))] - uri.binned[1:(length(uri.binned)-1)])/(tt.binned[2:(length(uri.binned))] - tt.binned[1:(length(tt.binned)-1)])
+
+  # smooth uri using spline
+  # first find where the jump is and don't fit the jump
+  # this is the index on the left
+  # jump.left.old  <- which.max(uri[-1]-uri[-length(uri)])
+  short.list.length <- min(sum(x1>0)/length(x1), sum(x2>0)/length(x2))
+
+  if(short.list.length < max(tt)){
+    jump.left <- which(tt>short.list.length)[1]-1
+  } else {
+    jump.left <- which.max(tt)
+  }
+
+#  reversed.index <- seq(length(tt), 1, by=-1)
+#  nequal <- sum(uri[reversed.index]== tt[reversed.index])
+#  temp  <- which(uri[reversed.index]== tt[reversed.index])[nequal]
+#  jump.left <- length(tt)-temp
+ 
+  if(jump.left < 6){
+   jump.left <- length(tt)
+  }
+    
+ 
+  if(is.null(spline.df))
+    uri.spl <- smooth.spline(tt[1:jump.left], uri[1:jump.left], df=6.4)
+  else{
+    uri.spl <- smooth.spline(tt[1:jump.left], uri[1:jump.left], df=spline.df)
+  }
+  # predict the first derivative
+  uri.der <- predict(uri.spl, tt[1:jump.left], deriv=1)
+
+  invisible(list(tv=tv, uri=uri, 
+                 uri.slope=uri.slope, t.binned=tt.binned[2:length(uri.binned)], 
+                 uri.spl=uri.spl, uri.der=uri.der, jump.left=jump.left,
+                 ntotal=ntotal))
+ }
+
 
 
 #plot.correspondence <-
@@ -492,4 +525,14 @@ function(z.1, z.2, e.z){
 
   return(list(p=p, mu=mu, sigma=sigma, rho=rho))
 }
+
+select.IDR <-
+  function(x, IDR.x, IDR.level){
+
+    is.selected <- IDR.x < IDR.level
+    x.selected <- x[is.selected,]
+    n.selected <- nrow(x.selected)
+    
+    return(list(x=x.selected, n=n.selected, IDR.level=IDR.level))
+  }
 

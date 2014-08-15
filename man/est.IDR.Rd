@@ -8,21 +8,24 @@ Estimate the irreproducible discovery rate using the copula mixture model
   Fit a Gaussian copula mixture model. 
 }
 \usage{
-est.IDR(x, mu, sigma, rho, p, eps, max.ite=30)
+est.IDR(x, mu, sigma, rho, p, eps=0.001, max.ite=30)
 }
 \arguments{
-  \item{x}{a m by n numeric matrix, where m= num of replicates,
+  \item{x}{an n by m numeric matrix, where m= num of replicates,
     n=num of observations. Numerical values representing the
-    significance of the observations, where signals are expected to have
-    large values, for example, -log(p-value).   Currently, m=2. }
+    significance of the observations. Note that significant signals 
+    are expected to have large values of x. In case that smaller values
+    represent higher significance (e.g. p-value), a monotonic transformation 
+    needs to be applied to reverse the order before using this function, 
+    for example, -log(p-value). Currently, m=2. }
   \item{mu}{ a starting value for the mean of the reproducible component.}
   \item{sigma}{ a starting value for the standard deviation of the
     reproducible component.}
   \item{rho}{ a starting value for the correlation coefficient of the
     reproducible component.}
   \item{p}{ a starting value for the proportion of reproducible component.}
-  \item{eps}{ Stopping criterion. Interations stop when the increment of
-    log-likelihood is < eps, default=0.001.}
+  \item{eps}{ Stopping criterion. Iterations stop when the increment of
+    log-likelihood is < eps*log-likelihood, Default=0.001.}
   \item{max.ite}{ Maximum number of iterations. Default=30.}
 }
 %\details{
@@ -68,7 +71,7 @@ sigma <- 1.3
 rho <- 0.8
 p <- 0.7
 
-idr.out <- est.IDR(x, mu, sigma, rho, p, eps=0.01, max.ite=20)
+idr.out <- est.IDR(x, mu, sigma, rho, p, eps=0.001, max.ite=20)
 
 names(idr.out)
 }

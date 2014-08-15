@@ -18,8 +18,9 @@ observations by  their irreproducibility.
 \tabular{ll}{
 Package: \tab idr\cr
 Type: \tab Package\cr
-Version: \tab 1.1.1\cr
+Version: \tab 1.2\cr
 Date: \tab 2012-10-26\cr
+Updates: \tab Improve the convergence of est.IDR (2014-08-15) \cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 }
@@ -51,14 +52,14 @@ Maintainer: Qunhua Li <qunhua.li@gmail.com>
 \examples{
 
 data("simu.idr")
-x <- cbind(simu.idr$x, simu.idr$y)
+x <- cbind(-simu.idr$x, -simu.idr$y)
 
 mu <- 2.6
 sigma <- 1.3
 rho <- 0.8
 p <- 0.7
 
-idr.out <- est.IDR(x, mu, sigma, rho, p, eps=0.001)
+idr.out <- est.IDR(x, mu, sigma, rho, p, eps=0.001, max.ite=20)
 
 names(idr.out)
 }
